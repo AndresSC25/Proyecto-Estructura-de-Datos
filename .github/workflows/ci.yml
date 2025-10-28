@@ -1,0 +1,34 @@
+name: CI - Build C++ (VS2022)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild (find MSBuild in PATH)
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Restore NuGet packages (if aplicable)
+        run: nuget restore Path/To/YourSolution.sln
+
+      - name: Build solution (Release x64)
+        run: msbuild Path/To/YourSolution.sln /p:Configuration=Release /p:Platform=x64
+
+      - name: Run unit tests (if tienes .test) - ejemplo usando vstest
+        run: |
+          "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" Path\To\YourTestProject\bin\Release\YourTest.dll
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: Path\To\Build\Output\*
